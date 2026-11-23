@@ -7,7 +7,7 @@ use App\Models\PositionKpi;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use illumintane\Support\Str;
+use Illuminate\Support\Str;
 
 class KpiIndicatorService
 {

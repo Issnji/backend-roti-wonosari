@@ -229,21 +229,20 @@ class KpiReviewService
                 $submission->update(['status' => $decision]);
 
                 KpiReview::updateOrCreate(
-                    [
+                    ['submission_id' => $submission->id],          // 1) kunci pencarian
+                    [                                              // 2) data (tepat dua array)
+                        'reviewer_id'  => $reviewer->id,
+                        'review_type'  => $isTrigger ? 'MANUAL' : 'CASCADE',
+                        'status'       => $decision->value,
+                        'score'        => $approved
+                            ? KpiScore::achievement($submission, $submission->positionKpi)
+                            : null,
+                        'notes'        => $reviewNotes,
+                        'reviewed_at'  => now(),
+                        // keputusan manager baru selalu menghapus finalisasi Admin yang lama
                         'finalized_by' => null,
                         'finalized_at' => null,
                         'final_notes'  => null,
-                    ],
-                    ['submission_id' => $submission->id],
-                    [
-                        'reviewer_id' => $reviewer->id,
-                        'review_type' => $isTrigger ? 'MANUAL' : 'CASCADE',
-                        'status'      => $decision->value,
-                        'score'       => $approved
-                            ? KpiScore::achievement($submission, $submission->positionKpi)
-                            : null,
-                        'notes'       => $reviewNotes,
-                        'reviewed_at' => now(),
                     ]
                 );
             }

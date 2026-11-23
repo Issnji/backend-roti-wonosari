@@ -17,12 +17,14 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $user = User::with(['role', 'position'])
-            ->where('email', $credentials['email'])
-            ->first();
+        $user = User::with(['role', 'position'])->where('email', $credentials['email'])->first();
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
-            throw ValidationException::withMessages(['email' => 'Email atau password salah.']);
+        if (! $user) {
+            throw ValidationException::withMessages(['email' => 'Email tidak terdaftar.']);
+        }
+
+        if (! Hash::check($credentials['password'], $user->password)) {
+            throw ValidationException::withMessages(['password' => 'Kata sandi salah.']);
         }
 
         if (! $user->is_active) {

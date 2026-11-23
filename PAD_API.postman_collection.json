@@ -479,6 +479,66 @@
             "description": "Melihat rincian per kategori dan catatan revisi (jika ada) untuk tanggal tertentu."
           },
           "response": []
+        },
+        {
+          "name": "Hapus Bukti Foto KPI",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/kpi-submissions/1/evidences/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "kpi-submissions",
+                "1",
+                "evidences",
+                "1"
+              ]
+            },
+            "description": "Menghapus salah satu file foto bukti sebelum submission dikirim / saat draft atau revisi."
+          },
+          "response": []
+        },
+        {
+          "name": "Rekap KPI Bulanan (Recap)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/my-kpis/recap?month=2026-11",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "my-kpis",
+                "recap"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-11",
+                  "description": "Format YYYY-MM (default: bulan berjalan)",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Melihat rekap pencapaian KPI bulanan, skor kumulatif, dan ringkasan per kategori."
+          },
+          "response": []
         }
       ]
     },
@@ -1513,6 +1573,137 @@
                   ]
                 },
                 "description": "Melihat rincian 1 capaian indikator termasuk bukti foto dan reviewer."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Persetujuan Akhir Admin (Final Reviews)",
+          "description": "Endpoint bagi Admin untuk menyetujui final atau menolak kembali laporan yang telah di-approve Manager.",
+          "item": [
+            {
+              "name": "Daftar Antrean Final Review",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/admin/final-reviews",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "final-reviews"
+                  ],
+                  "query": [
+                    {
+                      "key": "user_id",
+                      "value": "",
+                      "description": "Filter ID user",
+                      "disabled": true
+                    },
+                    {
+                      "key": "position_id",
+                      "value": "",
+                      "description": "Filter ID posisi",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_from",
+                      "value": "",
+                      "description": "Tanggal awal",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_to",
+                      "value": "",
+                      "description": "Tanggal akhir",
+                      "disabled": true
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15",
+                      "description": "Item per halaman",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Melihat laporan karyawan yang telah disetujui Manager dan menunggu approval final Admin."
+              },
+              "response": []
+            },
+            {
+              "name": "Detail Final Review per Karyawan & Tanggal",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/admin/final-reviews/3/2026-11-19",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "final-reviews",
+                    "3",
+                    "2026-11-19"
+                  ]
+                },
+                "description": "Melihat rincian indikator, foto bukti, dan review manager sebelum diputuskan final."
+              },
+              "response": []
+            },
+            {
+              "name": "Keputusan Final Review (Approve Final / Reject)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/admin/final-reviews/3/2026-11-19",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "final-reviews",
+                    "3",
+                    "2026-11-19"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"decision\": \"APPROVED\",\n  \"notes\": \"Laporan disetujui final oleh Admin.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Menyetujui final (APPROVED) atau menolak kembali ke karyawan (REJECTED). Jika REJECTED, 'notes' wajib diisi."
               },
               "response": []
             }
