@@ -60,6 +60,6 @@ class KpiEvidencesController extends Controller
     private function authorizeOwner(Request $request, KpiSubmission $submission): void
     {
         abort_unless($submission->user_id === $request->user()->id, 403, 'Anda tidak memiliki akses.');
-        abort_unless($submission->status->isEditable(), 422, 'Submission sudah dikirim, bukti tidak bisa diubah.');
+        abort_unless($this->isEditable($submission->status), 422, 'Submission sudah dikirim, bukti tidak bisa diubah.');
     }
 }

@@ -1,23 +1,24 @@
-<?php // app/Http/Controllers/MyKpiController.php
+<?php
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\MyKpiIndexRequest;
-use App\Http\Resources\PositionKpiResource;
-use App\Services\KpiCatalogService;
 use Carbon\Carbon;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class MyKpiController extends Controller
 {
-    public function __construct(private readonly KpiCatalogService $service) {}
-
-    public function index(MyKpiIndexRequest $request): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
-        $date = $request->filled('date') ? Carbon::parse($request->input('date')) : null;
+        $request->validate([
+            'date' => ['nullable', 'date_format:Y-m-d'],
+        ]);
 
-        return PositionKpiResource::collection(
-            $this->service->forUser($request->user(), $date)
-        );
+        $date  = $request->filled('date') ? Carbon::parse($request->input('date')) : null;
+        $items = $this->kpisForUser($request->user(), $date);
+
+        return response()->json([
+            'data' => $items->map(fn ($pk) => $this->positionKpiData($pk)),
+        ]);
     }
 }
