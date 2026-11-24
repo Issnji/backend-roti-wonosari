@@ -228,9 +228,10 @@ class KpiReviewService
 
                 $submission->update(['status' => $decision]);
 
+                // Review ulang oleh Manager membatalkan persetujuan akhir Admin sebelumnya
                 KpiReview::updateOrCreate(
-                    ['submission_id' => $submission->id],          // 1) kunci pencarian
-                    [                                              // 2) data (tepat dua array)
+                    ['submission_id' => $submission->id],
+                    [
                         'reviewer_id'  => $reviewer->id,
                         'review_type'  => $isTrigger ? 'MANUAL' : 'CASCADE',
                         'status'       => $decision->value,
@@ -239,7 +240,6 @@ class KpiReviewService
                             : null,
                         'notes'        => $reviewNotes,
                         'reviewed_at'  => now(),
-                        // keputusan manager baru selalu menghapus finalisasi Admin yang lama
                         'finalized_by' => null,
                         'finalized_at' => null,
                         'final_notes'  => null,

@@ -17,6 +17,10 @@ class AdminKpiSubmissionService
                 'user.position:id,name',
                 'positionKpi:id,position_id,kpi_indicator_id,target,weight,calculation_type',
                 'positionKpi.kpiIndicator:id,name,unit,assessment_type',
+                // Catatan & peninjau dipakai halaman Tinjau Revisi Admin
+                'review:id,submission_id,reviewer_id,review_type,status,score,notes,reviewed_at,finalized_at,final_notes',
+                'review.reviewer:id,name,role_id',
+                'review.reviewer.role:id,name',
             ])
             ->withCount('evidences')
             ->when($f['user_id'] ?? null, fn ($q, $v) => $q->where('user_id', $v))

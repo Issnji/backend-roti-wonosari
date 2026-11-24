@@ -47,6 +47,9 @@ class AdminKpiSubmissionResource extends JsonResource
             'review' => $this->whenLoaded('review', fn () => $this->review ? [
                 'status'      => $this->review->status,
                 'review_type' => $this->review->review_type,
+                'reviewer'    => $this->review->relationLoaded('reviewer') ? $this->review->reviewer?->name : null,
+                'reviewer_role' => $this->review->relationLoaded('reviewer') && $this->review->reviewer?->relationLoaded('role')
+                    ? $this->review->reviewer->role?->name : null,
                 'score'       => $this->review->score !== null ? (float) $this->review->score : null,
                 'notes'       => $this->review->notes,
                 'reviewed_at' => $this->review->reviewed_at,

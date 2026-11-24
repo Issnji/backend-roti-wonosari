@@ -16,10 +16,9 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TeamDashboardController;
 use App\Http\Controllers\KpiFinalReviewController;
-use App\Http\Controllers\MyKpiRecapController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
@@ -36,7 +35,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('dashboard/me', [MyDashboardController::class, 'index']);
         Route::get('my-kpis/history', [MyKpiHistoryController::class, 'index']);
         Route::get('my-kpis/history/{date}', [MyKpiHistoryController::class, 'show'])->where('date', '\d{4}-\d{2}-\d{2}');
-        Route::get('my-kpis/recap', [MyKpiRecapController::class, 'index']);
     });
 
     // Katalog (read) + review untuk admin & manager

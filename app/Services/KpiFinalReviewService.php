@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Enums\KpiSubmissionStatus;
+use App\Models\KpiReview;
 use App\Models\KpiSubmission;
+use App\Support\KpiScore;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,9 +23,8 @@ class KpiFinalReviewService
                 DB::raw('COUNT(*) as total_indicators'),
                 DB::raw('MAX(submitted_at) as submitted_at'),
             )
-            ->where('status', KpiSubmissionStatus::Approved->value)
+            ->where(fn ($q) => $this->scopePending($q))
             ->where('user_id', '!=', $admin->id)
-            ->whereHas('review', fn ($r) => $r->whereNull('finalized_at'))
             ->when($f['user_id'] ?? null, fn ($q, $v) => $q->where('user_id', $v))
             ->when($f['position_id'] ?? null, fn ($q, $v) => $q->whereHas('user', fn ($u) => $u->where('position_id', $v)))
             ->when($f['date_from'] ?? null, fn ($q, $v) => $q->whereDate('report_date', '>=', $v))
@@ -96,6 +97,20 @@ class KpiFinalReviewService
 
             foreach ($batch as $submission) {
                 if ($decision === KpiSubmissionStatus::Approved) {
+                    // Laporan Store Manager (belum ada review Manager): Admin sekaligus reviewer & penyetuju akhir
+                    if ($submission->status === KpiSubmissionStatus::Submitted) {
+                        $submission->update(['status' => KpiSubmissionStatus::Approved]);
+                        KpiReview::updateOrCreate(['submission_id' => $submission->id], [
+                            'reviewer_id' => $admin->id,
+                            'review_type' => 'MANUAL',
+                            'status'      => KpiSubmissionStatus::Approved->value,
+                            'score'       => KpiScore::achievement($submission, $submission->positionKpi),
+                            'notes'       => $notes,
+                            'reviewed_at' => now(),
+                        ]);
+                        $submission->load('review');
+                    }
+
                     $submission->review->update([
                         'finalized_by' => $admin->id,
                         'finalized_at' => now(),
@@ -107,7 +122,7 @@ class KpiFinalReviewService
 
                 // Ditolak Admin: kembali ke karyawan sebagai revisi (semua indikator laporan itu)
                 $submission->update(['status' => KpiSubmissionStatus::Rejected]);
-                $submission->review->update([
+                KpiReview::updateOrCreate(['submission_id' => $submission->id], [
                     'reviewer_id'  => $admin->id,
                     'review_type'  => 'MANUAL',
                     'status'       => KpiSubmissionStatus::Rejected->value,
@@ -129,7 +144,21 @@ class KpiFinalReviewService
         return KpiSubmission::query()
             ->where('user_id', $employee->id)
             ->whereDate('report_date', $date)
+            ->where(fn ($q) => $this->scopePending($q));
+    }
+
+    /**
+     * Menunggu keputusan akhir Admin:
+     *  - capaian karyawan yang sudah di-approve Manager tetapi belum difinalisasi, atau
+     *  - capaian Manager (Store Manager) yang sudah dikirim — tidak ada atasan lain selain Admin.
+     */
+    private function scopePending($query): void
+    {
+        $query->where(fn ($q) => $q
             ->where('status', KpiSubmissionStatus::Approved->value)
-            ->whereHas('review', fn ($r) => $r->whereNull('finalized_at'));
+            ->whereHas('review', fn ($r) => $r->whereNull('finalized_at')))
+            ->orWhere(fn ($q) => $q
+                ->where('status', KpiSubmissionStatus::Submitted->value)
+                ->whereHas('user.role', fn ($r) => $r->where('name', 'Manager')));
     }
 }

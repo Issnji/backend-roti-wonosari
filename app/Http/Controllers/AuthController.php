@@ -17,14 +17,21 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $user = User::with(['role', 'position'])->where('email', $credentials['email'])->first();
+        $user = User::with(['role', 'position'])
+            ->where('email', $credentials['email'])
+            ->first();
 
+        // Pesan dibedakan sesuai desain FE (Figma halaman Login): email tidak terdaftar vs kata sandi salah
         if (! $user) {
-            throw ValidationException::withMessages(['email' => 'Email tidak terdaftar.']);
+            throw ValidationException::withMessages([
+                'email' => 'Email tidak sesuai. Periksa kembali email yang Anda masukkan.',
+            ]);
         }
 
         if (! Hash::check($credentials['password'], $user->password)) {
-            throw ValidationException::withMessages(['password' => 'Kata sandi salah.']);
+            throw ValidationException::withMessages([
+                'password' => 'Kata sandi salah. Periksa kembali kata sandi yang Anda masukkan.',
+            ]);
         }
 
         if (! $user->is_active) {
@@ -56,7 +63,9 @@ class AuthController extends Controller
             'name'     => $user->name,
             'email'    => $user->email,
             'role'     => $user->role?->only(['id', 'name']),
-            'position' => $user->position?->only(['id', 'name']),
+            'position'   => $user->position?->only(['id', 'name']),
+            'is_active'  => (bool) $user->is_active,
+            'created_at' => $user->created_at?->toIso8601String(),
         ];
     }
 }
