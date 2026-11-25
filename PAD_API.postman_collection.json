@@ -286,7 +286,7 @@
               "query": [
                 {
                   "key": "date",
-                  "value": "2026-11-19",
+                  "value": "2026-11-25",
                   "description": "Format YYYY-MM-DD (maksimal hari ini)",
                   "disabled": true
                 }
@@ -318,7 +318,7 @@
               "query": [
                 {
                   "key": "date",
-                  "value": "2026-11-19",
+                  "value": "2026-11-25",
                   "description": "Format YYYY-MM-DD",
                   "disabled": true
                 }
@@ -357,7 +357,7 @@
             "description": "Menyimpan draft (submit: false) atau langsung mengirim (submit: true) capaian KPI harian.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"date\": \"2026-11-19\",\n  \"submit\": true,\n  \"items\": [\n    {\n      \"position_kpi_id\": 1,\n      \"answer_yes_no\": true,\n      \"numeric_value\": null\n    },\n    {\n      \"position_kpi_id\": 2,\n      \"answer_yes_no\": null,\n      \"numeric_value\": 100\n    }\n  ]\n}",
+              "raw": "{\n  \"date\": \"2026-11-25\",\n  \"submit\": true,\n  \"items\": [\n    {\n      \"position_kpi_id\": 1,\n      \"answer_yes_no\": true,\n      \"numeric_value\": null\n    },\n    {\n      \"position_kpi_id\": 2,\n      \"answer_yes_no\": null,\n      \"numeric_value\": 100\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -427,7 +427,7 @@
                 {
                   "key": "status",
                   "value": "APPROVED",
-                  "description": "Filter status (PENDING, APPROVED, REVISION, DRAFT)",
+                  "description": "Filter status laporan (APPROVED, PENDING, REVISION)",
                   "disabled": true
                 },
                 {
@@ -438,14 +438,20 @@
                 },
                 {
                   "key": "date_to",
-                  "value": "2026-11-19",
+                  "value": "2026-11-25",
                   "description": "Tanggal akhir YYYY-MM-DD",
                   "disabled": true
                 },
                 {
                   "key": "per_page",
                   "value": "15",
-                  "description": "Jumlah data per halaman",
+                  "description": "Jumlah data per halaman (1-100)",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Nomor halaman",
                   "disabled": true
                 }
               ]
@@ -466,14 +472,14 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/my-kpis/history/2026-11-19",
+              "raw": "{{base_url}}/my-kpis/history/2026-11-25",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "my-kpis",
                 "history",
-                "2026-11-19"
+                "2026-11-25"
               ]
             },
             "description": "Melihat rincian per kategori dan catatan revisi (jika ada) untuk tanggal tertentu."
@@ -569,14 +575,14 @@
               "query": [
                 {
                   "key": "date",
-                  "value": "2026-11-19",
-                  "description": "Format YYYY-MM-DD",
+                  "value": "2026-11-25",
+                  "description": "Format YYYY-MM-DD (maksimal hari ini)",
                   "disabled": true
                 },
                 {
                   "key": "status",
-                  "value": "",
-                  "description": "Filter status anggota tim",
+                  "value": "PENDING",
+                  "description": "Filter status anggota tim (PENDING, APPROVED, REJECTED, NOT_REPORTED)",
                   "disabled": true
                 },
                 {
@@ -678,20 +684,26 @@
                       "disabled": true
                     },
                     {
-                      "key": "status",
-                      "value": "PENDING",
-                      "description": "Filter status laporan",
+                      "key": "date_from",
+                      "value": "2026-11-01",
+                      "description": "Tanggal awal laporan (YYYY-MM-DD)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_to",
+                      "value": "2026-11-25",
+                      "description": "Tanggal akhir laporan (YYYY-MM-DD)",
                       "disabled": true
                     },
                     {
                       "key": "per_page",
                       "value": "15",
-                      "description": "Item per halaman",
+                      "description": "Item per halaman (1-100)",
                       "disabled": true
                     }
                   ]
                 },
-                "description": "Melihat daftar laporan karyawan yang menunggu keputusan review."
+                "description": "Melihat daftar laporan karyawan berstatus SUBMITTED yang menunggu keputusan review."
               },
               "response": []
             },
@@ -707,7 +719,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/reviews/reports/3/2026-11-19",
+                  "raw": "{{base_url}}/reviews/reports/3/2026-11-25",
                   "host": [
                     "{{base_url}}"
                   ],
@@ -715,7 +727,7 @@
                     "reviews",
                     "reports",
                     "3",
-                    "2026-11-19"
+                    "2026-11-25"
                   ]
                 },
                 "description": "Melihat seluruh indikator dan foto bukti yang dikirim karyawan (misal user ID: 3) pada tanggal tertentu."
@@ -739,7 +751,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/reviews/reports/3/2026-11-19",
+                  "raw": "{{base_url}}/reviews/reports/3/2026-11-25",
                   "host": [
                     "{{base_url}}"
                   ],
@@ -747,7 +759,7 @@
                     "reviews",
                     "reports",
                     "3",
-                    "2026-11-19"
+                    "2026-11-25"
                   ]
                 },
                 "description": "Menyetujui (APPROVED) atau Menolak (REJECTED) satu laporan karyawan secara utuh. Jika REJECTED, 'notes' wajib diisi.",
@@ -790,20 +802,38 @@
                   ],
                   "query": [
                     {
-                      "key": "status",
-                      "value": "PENDING",
-                      "description": "Filter status submission",
+                      "key": "user_id",
+                      "value": "",
+                      "description": "Filter ID user",
+                      "disabled": true
+                    },
+                    {
+                      "key": "position_id",
+                      "value": "",
+                      "description": "Filter ID posisi",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_from",
+                      "value": "2026-11-01",
+                      "description": "Tanggal awal laporan (YYYY-MM-DD)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_to",
+                      "value": "2026-11-25",
+                      "description": "Tanggal akhir laporan (YYYY-MM-DD)",
                       "disabled": true
                     },
                     {
                       "key": "per_page",
                       "value": "15",
-                      "description": "Item per halaman",
+                      "description": "Item per halaman (1-100)",
                       "disabled": true
                     }
                   ]
                 },
-                "description": "Daftar submission indikator satuan yang menunggu review."
+                "description": "Daftar submission indikator satuan berstatus SUBMITTED yang menunggu review."
               },
               "response": []
             },
@@ -1081,14 +1111,14 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/admin/users/1",
+                  "raw": "{{base_url}}/admin/users/3",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
                     "admin",
                     "users",
-                    "1"
+                    "3"
                   ]
                 },
                 "description": "Melihat profil lengkap salah satu pengguna berdasarkan ID."
@@ -1112,20 +1142,20 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/admin/users/1",
+                  "raw": "{{base_url}}/admin/users/3",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
                     "admin",
                     "users",
-                    "1"
+                    "3"
                   ]
                 },
                 "description": "Memperbarui data profil akun pengguna.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Ahmad Kasir Senior\",\n  \"email\": \"ahmad.kasir@rotiwonosari.test\",\n  \"role_id\": 3,\n  \"position_id\": 2,\n  \"is_active\": true\n}",
+                  "raw": "{\n  \"name\": \"Siti (Supervisor)\",\n  \"email\": \"spv@rotiwonosari.test\",\n  \"role_id\": 3,\n  \"position_id\": 6,\n  \"is_active\": true\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1152,18 +1182,18 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/admin/users/1/status",
+                  "raw": "{{base_url}}/admin/users/3/status",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
                     "admin",
                     "users",
-                    "1",
+                    "3",
                     "status"
                   ]
                 },
-                "description": "Mengubah status akun menjadi aktif (true) atau dinonaktifkan (false).",
+                "description": "Mengubah status akun menjadi aktif (true) atau dinonaktifkan (false). Catatan: tidak bisa menonaktifkan admin aktif terakhir.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"is_active\": false\n}",
@@ -1193,14 +1223,14 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/admin/users/1/password",
+                  "raw": "{{base_url}}/admin/users/3/password",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
                     "admin",
                     "users",
-                    "1",
+                    "3",
                     "password"
                   ]
                 },
@@ -1229,17 +1259,17 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/admin/users/1",
+                  "raw": "{{base_url}}/admin/users/8",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
                     "admin",
                     "users",
-                    "1"
+                    "8"
                   ]
                 },
-                "description": "Menghapus akun pengguna."
+                "description": "Menghapus akun pengguna (gagal jika akun sendiri, admin aktif terakhir, atau sudah punya riwayat capaian)."
               },
               "response": []
             }
@@ -1325,7 +1355,7 @@
                     "kpi-indicators"
                   ]
                 },
-                "description": "Menambahkan master indikator KPI baru.",
+                "description": "Menambahkan master indikator KPI baru (code opsional, otomatis dibuat jika kosong).",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"category_id\": 1,\n  \"name\": \"Kebersihan Area Kasir dan Display\",\n  \"description\": \"Memastikan area meja kasir dan etalase roti selalu rapi dan bersih\",\n  \"unit\": \"kali\",\n  \"assessment_type\": \"YES_NO\",\n  \"calculation_type\": \"HIGHER_IS_BETTER\",\n  \"requires_evidence\": true,\n  \"is_active\": true\n}",
@@ -1523,25 +1553,25 @@
                     {
                       "key": "status",
                       "value": "APPROVED",
-                      "description": "Filter status",
+                      "description": "Filter status (DRAFT, SUBMITTED, APPROVED, REJECTED)",
                       "disabled": true
                     },
                     {
                       "key": "date_from",
                       "value": "2026-11-01",
-                      "description": "Tanggal mulai",
+                      "description": "Tanggal mulai (period_start >= date_from)",
                       "disabled": true
                     },
                     {
                       "key": "date_to",
-                      "value": "2026-11-19",
-                      "description": "Tanggal akhir",
+                      "value": "2026-11-25",
+                      "description": "Tanggal akhir (period_end <= date_to)",
                       "disabled": true
                     },
                     {
                       "key": "per_page",
                       "value": "15",
-                      "description": "Item per halaman",
+                      "description": "Item per halaman (1-100)",
                       "disabled": true
                     }
                   ]
@@ -1580,7 +1610,7 @@
         },
         {
           "name": "Persetujuan Akhir Admin (Final Reviews)",
-          "description": "Endpoint bagi Admin untuk menyetujui final atau menolak kembali laporan yang telah di-approve Manager.",
+          "description": "Endpoint bagi Admin untuk menyetujui final atau menolak kembali laporan karyawan yang telah di-approve Manager maupun laporan Store Manager (SUBMITTED).",
           "item": [
             {
               "name": "Daftar Antrean Final Review",
@@ -1617,25 +1647,25 @@
                     },
                     {
                       "key": "date_from",
-                      "value": "",
-                      "description": "Tanggal awal",
+                      "value": "2026-11-01",
+                      "description": "Tanggal awal (YYYY-MM-DD)",
                       "disabled": true
                     },
                     {
                       "key": "date_to",
-                      "value": "",
-                      "description": "Tanggal akhir",
+                      "value": "2026-11-25",
+                      "description": "Tanggal akhir (YYYY-MM-DD)",
                       "disabled": true
                     },
                     {
                       "key": "per_page",
                       "value": "15",
-                      "description": "Item per halaman",
+                      "description": "Item per halaman (1-100)",
                       "disabled": true
                     }
                   ]
                 },
-                "description": "Melihat laporan karyawan yang telah disetujui Manager dan menunggu approval final Admin."
+                "description": "Melihat laporan karyawan yang telah disetujui Manager dan laporan Store Manager (SUBMITTED) yang menunggu approval final Admin."
               },
               "response": []
             },
@@ -1651,7 +1681,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/admin/final-reviews/3/2026-11-19",
+                  "raw": "{{base_url}}/admin/final-reviews/3/2026-11-25",
                   "host": [
                     "{{base_url}}"
                   ],
@@ -1659,10 +1689,10 @@
                     "admin",
                     "final-reviews",
                     "3",
-                    "2026-11-19"
+                    "2026-11-25"
                   ]
                 },
-                "description": "Melihat rincian indikator, foto bukti, dan review manager sebelum diputuskan final."
+                "description": "Melihat rincian indikator, foto bukti, dan review manager (jika ada) sebelum diputuskan final."
               },
               "response": []
             },
@@ -1683,7 +1713,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/admin/final-reviews/3/2026-11-19",
+                  "raw": "{{base_url}}/admin/final-reviews/3/2026-11-25",
                   "host": [
                     "{{base_url}}"
                   ],
@@ -1691,7 +1721,7 @@
                     "admin",
                     "final-reviews",
                     "3",
-                    "2026-11-19"
+                    "2026-11-25"
                   ]
                 },
                 "body": {

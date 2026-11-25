@@ -9,6 +9,8 @@ use App\Models\PositionKpi;
 use App\Models\User;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 /**
  * Controller induk. Semua controller lain "extends" ke sini,
@@ -90,6 +92,120 @@ abstract class Controller
     }
 
     // ------------------------------------------------------------------
+    // Review (pengganti KpiSubmissionPolicy) & filter capaian
+    // ------------------------------------------------------------------
+
+    /**
+     * Boleh tidaknya $reviewer me-review satu capaian.
+     * Admin: boleh semua. Store Manager: hanya capaian karyawan. Tidak boleh review capaian sendiri.
+     */
+    protected function canReview(User $reviewer, KpiSubmission $submission): bool
+    {
+        if ($submission->user_id === $reviewer->id) {
+            return false;
+        }
+
+        if ($reviewer->hasRole('admin')) {
+            return true;
+        }
+
+        if ($reviewer->hasRole('manager') && $reviewer->hasPosition('store manager')) {
+            $submission->loadMissing('user.role');
+
+            return (bool) $submission->user?->hasRole('karyawan');
+        }
+
+        return false;
+    }
+
+    /** Hentikan dengan 403 bila tidak berhak me-review. */
+    protected function authorizeReview(User $reviewer, KpiSubmission $submission): void
+    {
+        abort_unless($this->canReview($reviewer, $submission), 403, 'This action is unauthorized.');
+    }
+
+    /** Aturan filter yang sama untuk daftar capaian/laporan/antrean. */
+    protected function submissionFilterRules(): array
+    {
+        return [
+            'user_id'     => ['nullable', 'integer', 'exists:users,id'],
+            'role_id'     => ['nullable', 'integer', 'exists:roles,id'],
+            'position_id' => ['nullable', 'integer', 'exists:positions,id'],
+            'status'      => ['nullable', Rule::in(['DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED'])],
+            'date_from'   => ['nullable', 'date_format:Y-m-d'],
+            'date_to'     => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_from'],
+            'per_page'    => ['nullable', 'integer', 'min:1', 'max:100'],
+        ];
+    }
+
+    /** Bentuk JSON satu capaian untuk admin/manager (dulu AdminKpiSubmissionResource). */
+    protected function adminSubmissionData(KpiSubmission $s): array
+    {
+        $data = [
+            'id'            => $s->id,
+            'report_date'   => $s->report_date?->toDateString(),
+            'period_start'  => $s->period_start?->toDateString(),
+            'period_end'    => $s->period_end?->toDateString(),
+            'status'        => $this->statusOf($s->status),
+            'answer_yes_no' => $s->answer_yes_no,
+            'numeric_value' => $s->numeric_value !== null ? (float) $s->numeric_value : null,
+            'submitted_at'  => $s->submitted_at,
+        ];
+
+        if ($s->relationLoaded('user')) {
+            $data['user'] = $s->user ? [
+                'id'       => $s->user->id,
+                'name'     => $s->user->name,
+                'role'     => $s->user->role?->name,
+                'position' => $s->user->position?->name,
+            ] : null;
+        }
+
+        if ($s->relationLoaded('positionKpi')) {
+            $data['indicator'] = $s->positionKpi ? [
+                'position_kpi_id'  => $s->positionKpi->id,
+                'name'             => $s->positionKpi->kpiIndicator?->name,
+                'unit'             => $s->positionKpi->kpiIndicator?->unit,
+                'input_type'       => $s->positionKpi->kpiIndicator?->assessment_type,
+                'calculation_type' => $s->positionKpi->calculation_type,
+                'target'           => (float) $s->positionKpi->target,
+                'weight'           => (float) $s->positionKpi->weight,
+            ] : null;
+        }
+
+        if (array_key_exists('evidences_count', $s->getAttributes())) {
+            $data['evidences_count'] = $s->evidences_count;
+        }
+
+        if ($s->relationLoaded('evidences')) {
+            $data['evidences'] = $s->evidences->map(fn ($e) => [
+                'id'        => $e->id,
+                'file_name' => $e->file_name,
+                'url'       => Storage::disk('public')->url($e->file_path),
+            ])->values();
+        }
+
+        if ($s->relationLoaded('review')) {
+            $r = $s->review;
+
+            $data['review'] = $r ? [
+                'status'        => $r->status,
+                'review_type'   => $r->review_type,
+                'reviewer'      => $r->relationLoaded('reviewer') ? $r->reviewer?->name : null,
+                'reviewer_role' => $r->relationLoaded('reviewer') && $r->reviewer?->relationLoaded('role')
+                    ? $r->reviewer->role?->name : null,
+                'score'         => $r->score !== null ? (float) $r->score : null,
+                'notes'         => $r->notes,
+                'reviewed_at'   => $r->reviewed_at,
+                'finalized_at'  => $r->finalized_at,
+                'final_notes'   => $r->final_notes,
+            ] : null;
+        }
+
+        return $data;
+    }
+
+    // ------------------------------------------------------------------
     // Bentuk JSON bersama
     // ------------------------------------------------------------------
 
@@ -108,7 +224,7 @@ abstract class Controller
 
         // Hanya muncul kalau relasinya memang di-load (sama seperti whenLoaded)
         if ($i->relationLoaded('kpiCategory')) {
-            $data['category'] = $this->categoryData($i->kpiCategory);
+            $data['category'] = $i->kpiCategory ? $this->categoryData($i->kpiCategory) : null;
         }
 
         $data['requires_evidence'] = $i->requires_evidence;
@@ -203,7 +319,7 @@ abstract class Controller
             'frequency'         => $pk->frequency,
             'calculation_type'  => $pk->calculation_type,
             'input_type'        => $pk->kpiIndicator?->assessment_type,
-            'indicator'         => $this->indicatorData($pk->kpiIndicator),
+            'indicator'         => $pk->kpiIndicator ? $this->indicatorData($pk->kpiIndicator) : null,
         ];
 
         // hanya ada di /my-kpis

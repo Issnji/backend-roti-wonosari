@@ -56,7 +56,9 @@ class KpiIndicatorController extends Controller
         ]);
 
         // FE mencocokkan indikator lewat code -> selalu terisi, unik
-        $data['code'] ??= $this->makeCode($data['name']);
+        $data['code']              ??= $this->makeCode($data['name']);
+        $data['requires_evidence'] ??= false;
+        $data['is_active']         ??= true;
 
         $indicator = KpiIndicator::create($data)->load('kpiCategory');
 

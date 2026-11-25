@@ -25,7 +25,7 @@ class MyKpiHistoryController extends Controller
         ]);
 
         $user          = $request->user();
-        $perPage       = (int) $request->input('per_page', 15);
+        $perPage       = (int) ($f['per_page'] ?? 15);
         $totalExpected = $this->assignedPerCategory($user)->sum();
 
         // 1 query agregat; per user jumlah laporan kecil (maks ±1 baris/hari)

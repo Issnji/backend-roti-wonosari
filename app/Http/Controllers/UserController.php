@@ -42,7 +42,10 @@ class UserController extends Controller
     public function store(Request $request): JsonResponse
     {
         // non-admin wajib punya jabatan
-        $roleName = Role::whereKey($request->input('role_id'))->value('name');
+        $roleId   = $request->input('role_id');
+        $roleName = is_scalar($roleId) && is_numeric($roleId)
+            ? Role::whereKey((int) $roleId)->value('name')
+            : null;
         $isAdmin  = $roleName !== null && strtolower(trim($roleName)) === 'admin';
 
         $data = $request->validate([
